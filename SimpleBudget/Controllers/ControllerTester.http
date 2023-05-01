@@ -1,0 +1,5 @@
+GET https://localhost:44428/api/user
+
+### 
+
+GET https://localhost:44428/api/weatherforecast
