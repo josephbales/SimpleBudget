@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
+using Microsoft.IdentityModel.Logging;
 using SimpleBudget.Data.Context;
 using System.Configuration;
+using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -51,22 +53,56 @@ services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         /// Bear in mind that you can do any of the above checks within the individual routes and/or controllers as well.
         /// For more information, visit: https://docs.microsoft.com/azure/active-directory/develop/access-tokens#validate-the-user-has-permission-to-access-this-data
         /// </summary>
+        /// 
+
+        options.Events.OnChallenge = context =>
+        {
+            if (context.AuthenticateFailure != null)
+            {
+                context.Response.Headers.Add("Token-Expired", "true");
+            }
+            return Task.CompletedTask;
+        };
+
+        options.Events.OnAuthenticationFailed = context =>
+        {
+            if (context.Exception.GetType() == typeof(Microsoft.IdentityModel.Tokens.SecurityTokenExpiredException))
+            {
+                context.Response.Headers.Add("Token-Expired", "true");
+            }
+            return Task.CompletedTask;
+        };
 
         options.Events.OnTokenValidated = async context =>
         {
-            string[] allowedClientApps = { /* list of client ids to allow */ };
+            var principal = context.Principal;
 
-            string clientAppId = context?.Principal?.Claims
-                .FirstOrDefault(x => x.Type == "azp" || x.Type == "appid")?.Value;
-
-            var user = context.Principal;
-
-            if (!allowedClientApps.Contains(clientAppId))
+            if (principal != null)
             {
-                throw new System.Exception("This client is not authorized");
+                var dbContext = context.HttpContext.RequestServices.GetRequiredService<SimpleBudgetContext>();
+
+                var userEmailClaim = principal.Claims
+                    .FirstOrDefault(x => x.Type == ClaimTypes.Email);
+                var user = await dbContext.Users
+                    .FirstOrDefaultAsync(x => x.Email == userEmailClaim.Value);
+
+                if (user == null)
+                {
+                    context.Fail("Not Authorized");
+                }
+                else
+                {
+                    context.Principal.Identities.First().AddClaim(new Claim("isadmin", "true", ClaimValueTypes.Boolean));
+                }
+            }
+            else
+            {
+                context.Fail("Not Authorized");
             }
         };
     }, options => { configuration.Bind("AzureAd", options); });
+
+IdentityModelEventSource.ShowPII = true;
 
 var app = builder.Build();
 
@@ -80,7 +116,7 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
-app.UseAuthorization();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(

@@ -21,9 +21,13 @@ namespace SimpleBudget.Controllers
         [HttpGet]
         public async Task<IActionResult> GetUser()
         {
-            var authorizedUser = User.Identity.Name;
+            var authorizedUserEmail = User.Claims
+                .FirstOrDefault(x => x.Type == System.Security.Claims.ClaimTypes.Email);
+
+            if (authorizedUserEmail == null) { return Unauthorized(); }
+
             var user = await _context.Users
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(x => x.Email == authorizedUserEmail.Value);
 
             if (user == null) { return NotFound(); }
 
@@ -33,7 +37,7 @@ namespace SimpleBudget.Controllers
 
             //user.BudgetTemplates = templates;
 
-            return Ok(user);
+            return Ok(new { user.Id, Email = "hurrdurr", user.FirstName, user.LastName });
         }
     }
 }
