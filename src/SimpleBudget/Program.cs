@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Logging;
 using SimpleBudget.Data.Context;
-using System.Configuration;
 using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -38,41 +37,17 @@ services.AddDbContext<SimpleBudgetContext>(options =>
 //        ?? throw new ArgumentNullException();
 //});
 
+//services.AddAuthentication().AddGoogle(googleOptions =>
+//{
+//    googleOptions.ClientId = configuration["Authentication:Google:ClientId"];
+//    googleOptions.ClientSecret = configuration["Authentication:Google:ClientSecret"];
+//});
+
 services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddMicrosoftIdentityWebApi(options =>
     {
         configuration.Bind("AzureAd", options);
         options.Events = new JwtBearerEvents();
-
-        /// <summary>
-        /// Below you can do extended token validation and check for additional claims, such as:
-        ///
-        /// - check if the caller's account is homed or guest via the 'acct' optional claim
-        /// - check if the caller belongs to right roles or groups via the 'roles' or 'groups' claim, respectively
-        ///
-        /// Bear in mind that you can do any of the above checks within the individual routes and/or controllers as well.
-        /// For more information, visit: https://docs.microsoft.com/azure/active-directory/develop/access-tokens#validate-the-user-has-permission-to-access-this-data
-        /// </summary>
-        /// 
-
-        options.Events.OnChallenge = context =>
-        {
-            if (context.AuthenticateFailure != null)
-            {
-                context.Response.Headers.Add("Token-Expired", "true");
-            }
-            return Task.CompletedTask;
-        };
-
-        options.Events.OnAuthenticationFailed = context =>
-        {
-            if (context.Exception.GetType() == typeof(Microsoft.IdentityModel.Tokens.SecurityTokenExpiredException))
-            {
-                context.Response.Headers.Add("Token-Expired", "true");
-            }
-            return Task.CompletedTask;
-        };
-
         options.Events.OnTokenValidated = async context =>
         {
             var principal = context.Principal;

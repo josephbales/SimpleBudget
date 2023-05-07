@@ -3,68 +3,52 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
-import { MsalModule, MsalRedirectComponent, MsalGuard, MsalInterceptor, MSAL_INSTANCE, MSAL_GUARD_CONFIG, MSAL_INTERCEPTOR_CONFIG, MsalService, MsalBroadcastService, MsalInterceptorConfiguration, MsalGuardConfiguration } from '@azure/msal-angular';
-import { IPublicClientApplication, PublicClientApplication } from '@azure/msal-browser';
+import { SocialLoginModule, SocialAuthServiceConfig, GoogleSigninButtonModule } from '@abacritt/angularx-social-login';
 
 import { AppComponent } from './app.component';
-import { NavMenuComponent } from './nav-menu/nav-menu.component';
-import { HomeComponent } from './home/home.component';
-import { CounterComponent } from './counter/counter.component';
-import { FetchDataComponent } from './fetch-data/fetch-data.component';
-import { UserComponent } from './user/user.component';
-
-import { msalConfig, msalInterceptorConfig, msalGuardConfig } from './auth-config';
-
-export function MSALInstanceFactory(): IPublicClientApplication {
-    return new PublicClientApplication(msalConfig);
-}
-
-export function MSALInterceptorConfigFactory(): MsalInterceptorConfiguration {
-  return msalInterceptorConfig;
-}
-
-export function MSALGuardConfigFactory(): MsalGuardConfiguration {
-  return msalGuardConfig;
-}
+import { NavMenuComponent } from './shared/nav-menu/nav-menu.component';
+import { HomeComponent } from './components/home/home.component';
+import { FetchDataComponent } from './components/fetch-data/fetch-data.component';
+import { UserProfileComponent } from './components/user-profile/user-profile.component';
+import { UserDashboardComponent } from './components/user-dashboard/user-dashboard.component';
+import { GoogleLoginProvider } from '@abacritt/angularx-social-login';
 
 @NgModule({
   declarations: [
     AppComponent,
     NavMenuComponent,
     HomeComponent,
-    CounterComponent,
     FetchDataComponent,
-    UserComponent
+    UserProfileComponent,
+    UserDashboardComponent,
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
     HttpClientModule,
     FormsModule,
     AppRoutingModule,
-    MsalModule
+    SocialLoginModule,
+    GoogleSigninButtonModule 
   ],
   providers: [
     {
-      provide: HTTP_INTERCEPTORS,
-      useClass: MsalInterceptor,
-      multi: true
-    },
-    {
-      provide: MSAL_INSTANCE,
-      useFactory: MSALInstanceFactory
-    },
-    {
-      provide: MSAL_GUARD_CONFIG,
-      useFactory: MSALGuardConfigFactory
-    },
-    {
-      provide: MSAL_INTERCEPTOR_CONFIG,
-      useFactory: MSALInterceptorConfigFactory
-    },
-    MsalService,
-    MsalGuard,
-    MsalBroadcastService
+      provide: 'SocialAuthServiceConfig',
+      useValue: {
+        autoLogin: false,
+        providers: [
+          {
+            id: GoogleLoginProvider.PROVIDER_ID,
+            provider: new GoogleLoginProvider(
+              '744377179855-of51ggua4sulmru09f7akraf2ab4l166.apps.googleusercontent.com'
+            )
+          }
+        ],
+        onError: (err) => {
+          console.error(err);
+        }
+      } as SocialAuthServiceConfig,
+    }
   ],
-  bootstrap: [AppComponent, MsalRedirectComponent]
+  bootstrap: [AppComponent]
 })
 export class AppModule { }

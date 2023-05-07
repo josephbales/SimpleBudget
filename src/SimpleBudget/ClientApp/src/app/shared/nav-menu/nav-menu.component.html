@@ -26,17 +26,17 @@
             <a class="nav-link text-dark" [routerLink]="['/']">Home</a>
           </li>
           <li class="nav-item" [routerLinkActive]="['link-active']">
-            <a class="nav-link text-dark" [routerLink]="['/counter']">Counter</a>
-          </li>
-          <li class="nav-item" [routerLinkActive]="['link-active']">
             <a class="nav-link text-dark" [routerLink]="['/fetch-data']">Fetch data</a>
           </li>
           <li class="nav-item" [routerLinkActive]="['link-active']">
-            <a class="nav-link text-dark" [routerLink]="['/user']">User</a>
+            <a class="nav-link text-dark" [routerLink]="['/user-dashboard']">User Dashboard</a>
           </li>
-          <!--<li><button *ngIf="loginDisplay" (click)="testUser()">Test User</button></li>-->
-          <li><button *ngIf="!loginDisplay" (click)="loginPopup()">Login</button></li>
-          <li><button *ngIf="loginDisplay" (click)="logout()">Logout</button></li>
+          <li class="nav-item" [routerLinkActive]="['link-active']">
+            <a class="nav-link text-dark" [routerLink]="['/user-profile']">User Profile</a>
+          </li>
+          <li>
+            <asl-google-signin-button type='icon' size='medium'></asl-google-signin-button>
+          </li>
         </ul>
       </div>
     </div>
