@@ -1,9 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Logging;
 using SimpleBudget.Data.Context;
-using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -19,7 +17,9 @@ JsonSerializerOptions options = new()
     WriteIndented = true
 };
 
-services.AddControllers().AddJsonOptions(opt => opt.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+services.AddControllers().AddJsonOptions(opt =>
+    opt.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+
 services.AddDbContext<SimpleBudgetContext>(options =>
     options.UseCosmos(
         accountEndpoint: configuration.GetValue<string>("Azure:CosmosDB:AccountEndpoint")
@@ -29,55 +29,54 @@ services.AddDbContext<SimpleBudgetContext>(options =>
         databaseName: configuration.GetValue<string>("Azure:CosmosDB:DataBaseName")
             ?? throw new ArgumentNullException())
     );
-//services.AddAuthentication().AddMicrosoftAccount(microsoftOptions =>
+
+//services.AddAuthentication().AddGoogle(options =>
 //{
-//    microsoftOptions.ClientId = configuration["Authentication:Microsoft:ClientId"]
+//    options.ClientId = configuration["Authentication:Google:ClientId"]
 //        ?? throw new ArgumentNullException();
-//    microsoftOptions.ClientSecret = configuration["Authentication:Microsoft:ClientSecret"]
+//    options.ClientSecret = configuration["Authentication:Google:ClientSecret"]
 //        ?? throw new ArgumentNullException();
+//    options.Events.
 //});
 
-//services.AddAuthentication().AddGoogle(googleOptions =>
-//{
-//    googleOptions.ClientId = configuration["Authentication:Google:ClientId"];
-//    googleOptions.ClientSecret = configuration["Authentication:Google:ClientSecret"];
-//});
+//services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+//    .AddMicrosoftIdentityWebApi(options =>
+//    {
+//        configuration.Bind("AzureAd", options);
+//        options.Events = new JwtBearerEvents();
+//        options.Events.OnTokenValidated = async context =>
+//        {
+//            var principal = context.Principal;
 
-services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddMicrosoftIdentityWebApi(options =>
-    {
-        configuration.Bind("AzureAd", options);
-        options.Events = new JwtBearerEvents();
-        options.Events.OnTokenValidated = async context =>
-        {
-            var principal = context.Principal;
+//            if (principal != null)
+//            {
+//                var dbContext = context.HttpContext.RequestServices.GetRequiredService<SimpleBudgetContext>();
 
-            if (principal != null)
-            {
-                var dbContext = context.HttpContext.RequestServices.GetRequiredService<SimpleBudgetContext>();
+//                var userEmailClaim = principal.Claims
+//                    .FirstOrDefault(x => x.Type == ClaimTypes.Email);
+//                var user = await dbContext.Users
+//                    .FirstOrDefaultAsync(x => x.Email == userEmailClaim.Value);
 
-                var userEmailClaim = principal.Claims
-                    .FirstOrDefault(x => x.Type == ClaimTypes.Email);
-                var user = await dbContext.Users
-                    .FirstOrDefaultAsync(x => x.Email == userEmailClaim.Value);
+//                if (user == null)
+//                {
+//                    context.Fail("Not Authorized");
+//                }
+//                else
+//                {
+//                    context.Principal.Identities.First().AddClaim(new Claim("isadmin", "true", ClaimValueTypes.Boolean));
+//                }
+//            }
+//            else
+//            {
+//                context.Fail("Not Authorized");
+//            }
+//        };
+//    }, options => { configuration.Bind("AzureAd", options); });
 
-                if (user == null)
-                {
-                    context.Fail("Not Authorized");
-                }
-                else
-                {
-                    context.Principal.Identities.First().AddClaim(new Claim("isadmin", "true", ClaimValueTypes.Boolean));
-                }
-            }
-            else
-            {
-                context.Fail("Not Authorized");
-            }
-        };
-    }, options => { configuration.Bind("AzureAd", options); });
-
-IdentityModelEventSource.ShowPII = true;
+if (builder.Environment.IsDevelopment())
+{
+    IdentityModelEventSource.ShowPII = true;
+}
 
 var app = builder.Build();
 

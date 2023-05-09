@@ -35,7 +35,8 @@
             <a class="nav-link text-dark" [routerLink]="['/user-profile']">User Profile</a>
           </li>
           <li>
-            <asl-google-signin-button type='icon' size='medium'></asl-google-signin-button>
+            <asl-google-signin-button type='standard' size='medium' *ngIf="!loggedIn"></asl-google-signin-button>
+            <button class="btn btn-primary" *ngIf="loggedIn" (click)="logout()">Logout</button>
           </li>
         </ul>
       </div>

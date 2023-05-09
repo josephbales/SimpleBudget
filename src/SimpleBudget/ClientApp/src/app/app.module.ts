@@ -3,15 +3,17 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
-import { SocialLoginModule, SocialAuthServiceConfig, GoogleSigninButtonModule } from '@abacritt/angularx-social-login';
+import { SocialLoginModule, GoogleSigninButtonModule } from '@abacritt/angularx-social-login';
 
 import { AppComponent } from './app.component';
-import { NavMenuComponent } from './shared/nav-menu/nav-menu.component';
+import { NavMenuComponent } from './shared/components/nav-menu/nav-menu.component';
 import { HomeComponent } from './components/home/home.component';
 import { FetchDataComponent } from './components/fetch-data/fetch-data.component';
 import { UserProfileComponent } from './components/user-profile/user-profile.component';
 import { UserDashboardComponent } from './components/user-dashboard/user-dashboard.component';
-import { GoogleLoginProvider } from '@abacritt/angularx-social-login';
+
+import { JwtModule } from '@auth0/angular-jwt';
+import { jwtConfig, socialAuthServiceConfig } from './auth-config';
 
 @NgModule({
   declarations: [
@@ -23,30 +25,20 @@ import { GoogleLoginProvider } from '@abacritt/angularx-social-login';
     UserDashboardComponent,
   ],
   imports: [
-    BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
+    BrowserModule,
     HttpClientModule,
     FormsModule,
     AppRoutingModule,
     SocialLoginModule,
-    GoogleSigninButtonModule 
+    GoogleSigninButtonModule,
+    JwtModule.forRoot({
+      config: jwtConfig
+    })
   ],
   providers: [
     {
       provide: 'SocialAuthServiceConfig',
-      useValue: {
-        autoLogin: false,
-        providers: [
-          {
-            id: GoogleLoginProvider.PROVIDER_ID,
-            provider: new GoogleLoginProvider(
-              '744377179855-of51ggua4sulmru09f7akraf2ab4l166.apps.googleusercontent.com'
-            )
-          }
-        ],
-        onError: (err) => {
-          console.error(err);
-        }
-      } as SocialAuthServiceConfig,
+      useValue: socialAuthServiceConfig,
     }
   ],
   bootstrap: [AppComponent]
