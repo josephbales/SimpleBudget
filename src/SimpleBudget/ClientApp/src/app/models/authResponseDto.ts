@@ -1,6 +1,6 @@
 export interface AuthResponseDto {
   isAuthSuccessful: boolean;
-  errorMessage: string;
-  token: string;
-  provider: string;
+  errorMessage: string | null;
+  token: string | null;
+  provider: string | null;
 }

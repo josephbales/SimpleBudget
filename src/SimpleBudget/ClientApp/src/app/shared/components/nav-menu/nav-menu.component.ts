@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Subject } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 import { AuthenticationService } from '../../../services/authentication.service';
 import { ExternalAuthDto } from '../../../models/externalAuthDto';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -27,13 +27,16 @@ export class NavMenuComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
-    this.authService.authChanged.subscribe((isAuthenticated) => {
+    this.authService.authChanged.pipe(takeUntil(this._destroying$)).subscribe((isAuthenticated) => {
       this.loggedIn = isAuthenticated;
     });
+    this.loggedIn = this.authService.isUserAuthenticated();
   }
 
   login(): void {
-    this.router.navigate(['/login'], { queryParams: { returnUrl: this.router.routerState.snapshot.url } });
+    const existingReturnUrl = this.router.routerState.snapshot.root.queryParams['returnUrl'];
+    const returnUrl = existingReturnUrl ? existingReturnUrl : this.router.routerState.snapshot.url;
+    this.router.navigate(['/login'], { queryParams: { returnUrl: returnUrl } });
   }
 
   //externalLogin = () => {

@@ -1,34 +1,37 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { ReplaySubject, Subject } from 'rxjs';
-import { SocialAuthService, SocialUser } from "@abacritt/angularx-social-login";
+import { Observable, ReplaySubject, Subject } from 'rxjs';
+import { SocialAuthService, SocialUser } from '@abacritt/angularx-social-login';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { ExternalAuthDto} from '../models/externalAuthDto';
 import { AuthResponseDto } from '../models/authResponseDto';
+import { Router } from '@angular/router';
+import { ApiService } from './api.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthenticationService {
   private authChangeSub = new Subject<boolean>();
-  //private extAuthChangeSub = new Subject<SocialUser>();
-  //public isLoggedIn = new Subject<boolean>();
   public authChanged = this.authChangeSub.asObservable();
-  //public extAuthChanged = this.extAuthChangeSub.asObservable();
   public isLoggedIn = new ReplaySubject<boolean>(1);
-  //public isExternalAuth: boolean = false;
 
   constructor(private http: HttpClient,
     private jwtHelper: JwtHelperService,
-    private socialAuthService: SocialAuthService) {
+    private socialAuthService: SocialAuthService,
+    private router: Router,
+    private apiService: ApiService) {
     this.socialAuthService.authState.subscribe((user) => {
-      console.log(user);
-      let appToken = this.externalLogin({ provider: 'Google', idToken: user.idToken });
-      //this.extAuthChangeSub.next(user);
-      //this.isExternalAuth = true;
-      //this.isLoggedIn.next(user != null);
-      localStorage.setItem('token', JSON.stringify(appToken));
-      this.authChangeSub.next(true);
+      this.apiService.externalLogin({ provider: 'Google', idToken: user.idToken }).subscribe((resp) => {
+        console.log('externalLogin', resp);
+        if (resp.isAuthSuccessful) {
+          localStorage.setItem('token', JSON.stringify(resp));
+          this.authChangeSub.next(true);
+        }
+        else {
+          console.error('User is not authenticated.');
+        }
+      });
     })
   }
 
@@ -39,25 +42,24 @@ export class AuthenticationService {
   public logout = () => {
     localStorage.removeItem('token');
     this.sendAuthStateChangeNotification(false);
+    this.router.navigate(['/login']);
   }
 
   public isUserAuthenticated = (): boolean => {
     const tokenJson: string | null = localStorage.getItem('token');
-    let token: ExternalAuthDto = {} as ExternalAuthDto;
+    console.log('tokenJson', tokenJson);
+    let auth: AuthResponseDto = {} as AuthResponseDto;
     if (tokenJson) {
       // Check for errors and handle
-      token = JSON.parse(tokenJson) as ExternalAuthDto;
+      try {
+        auth = JSON.parse(tokenJson) as AuthResponseDto;
+        console.log('auth', auth);
+      } catch (e) {
+        console.log('e', e);
+        this.logout();
+      }
     }
       
-    return token !== {} as ExternalAuthDto && !this.jwtHelper.isTokenExpired(token.idToken);
-  }
-
-  public signOutExternal = () => {
-    this.socialAuthService.signOut();
-  }
-
-  public externalLogin = (body: ExternalAuthDto): string => {
-    return body.idToken;
-    //return this.http.post<AuthResponseDto>('api/auth/external-login', body);
+    return auth !== {} as AuthResponseDto && !this.jwtHelper.isTokenExpired(auth.token);
   }
 }
