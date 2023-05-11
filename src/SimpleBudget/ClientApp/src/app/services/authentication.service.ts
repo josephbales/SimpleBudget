@@ -27,7 +27,7 @@ export class AuthenticationService {
       //this.extAuthChangeSub.next(user);
       //this.isExternalAuth = true;
       //this.isLoggedIn.next(user != null);
-      localStorage.setItem("token", appToken);
+      localStorage.setItem('token', JSON.stringify(appToken));
       this.authChangeSub.next(true);
     })
   }
@@ -37,13 +37,19 @@ export class AuthenticationService {
   }
 
   public logout = () => {
-    localStorage.removeItem("token");
+    localStorage.removeItem('token');
     this.sendAuthStateChangeNotification(false);
   }
 
   public isUserAuthenticated = (): boolean => {
-    const token: string = localStorage.getItem("token") ?? "";
-    return token !== "" && !this.jwtHelper.isTokenExpired(token);
+    const tokenJson: string | null = localStorage.getItem('token');
+    let token: ExternalAuthDto = {} as ExternalAuthDto;
+    if (tokenJson) {
+      // Check for errors and handle
+      token = JSON.parse(tokenJson) as ExternalAuthDto;
+    }
+      
+    return token !== {} as ExternalAuthDto && !this.jwtHelper.isTokenExpired(token.idToken);
   }
 
   public signOutExternal = () => {
@@ -51,7 +57,7 @@ export class AuthenticationService {
   }
 
   public externalLogin = (body: ExternalAuthDto): string => {
-    return 'abc123';
+    return body.idToken;
     //return this.http.post<AuthResponseDto>('api/auth/external-login', body);
   }
 }

@@ -11,6 +11,7 @@ import { HomeComponent } from './components/home/home.component';
 import { FetchDataComponent } from './components/fetch-data/fetch-data.component';
 import { UserProfileComponent } from './components/user-profile/user-profile.component';
 import { UserDashboardComponent } from './components/user-dashboard/user-dashboard.component';
+import { UserLoginComponent } from './components/user-login/user-login.component';
 
 import { JwtModule } from '@auth0/angular-jwt';
 import { jwtConfig, socialAuthServiceConfig } from './auth-config';
@@ -23,6 +24,7 @@ import { jwtConfig, socialAuthServiceConfig } from './auth-config';
     FetchDataComponent,
     UserProfileComponent,
     UserDashboardComponent,
+    UserLoginComponent,
   ],
   imports: [
     BrowserModule,

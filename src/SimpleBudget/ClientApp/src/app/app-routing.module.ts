@@ -5,6 +5,7 @@ import { HomeComponent } from './components/home/home.component';
 import { UserProfileComponent } from './components/user-profile/user-profile.component';
 import { UserDashboardComponent } from './components/user-dashboard/user-dashboard.component';
 import { AuthGuard } from './shared/guards/auth.guard';
+import { UserLoginComponent } from './components/user-login/user-login.component';
 
 const routes: Routes = [
   {
@@ -17,13 +18,18 @@ const routes: Routes = [
     component: FetchDataComponent,
   },
   {
-    path: 'user-profile',
+    path: 'profile',
     component: UserProfileComponent,
     canActivate: [AuthGuard],
   },
   {
-    path: 'user-dashboard',
+    path: 'dashboard',
     component: UserDashboardComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'login',
+    component: UserLoginComponent,
   },
 ];
 

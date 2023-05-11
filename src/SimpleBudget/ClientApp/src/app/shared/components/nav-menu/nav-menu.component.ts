@@ -3,7 +3,7 @@ import { Subject } from 'rxjs';
 import { AuthenticationService } from '../../../services/authentication.service';
 import { ExternalAuthDto } from '../../../models/externalAuthDto';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { Router, RouterStateSnapshot } from '@angular/router';
 import { SocialAuthService, SocialUser } from '@abacritt/angularx-social-login';
 
 @Component({
@@ -32,6 +32,10 @@ export class NavMenuComponent implements OnInit, OnDestroy {
     });
   }
 
+  login(): void {
+    this.router.navigate(['/login'], { queryParams: { returnUrl: this.router.routerState.snapshot.url } });
+  }
+
   //externalLogin = () => {
   //  this.showError = false;
   //  this.authService.signInWithGoogle();
@@ -47,7 +51,6 @@ export class NavMenuComponent implements OnInit, OnDestroy {
   //}
 
   public logout = () => {
-    debugger;
     this.authService.logout();
   }
 

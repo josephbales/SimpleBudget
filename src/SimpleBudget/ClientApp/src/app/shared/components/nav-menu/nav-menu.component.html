@@ -29,13 +29,13 @@
             <a class="nav-link text-dark" [routerLink]="['/fetch-data']">Fetch data</a>
           </li>
           <li class="nav-item" [routerLinkActive]="['link-active']">
-            <a class="nav-link text-dark" [routerLink]="['/user-dashboard']">User Dashboard</a>
+            <a class="nav-link text-dark" [routerLink]="['/dashboard']">User Dashboard</a>
           </li>
           <li class="nav-item" [routerLinkActive]="['link-active']">
-            <a class="nav-link text-dark" [routerLink]="['/user-profile']">User Profile</a>
+            <a class="nav-link text-dark" [routerLink]="['/profile']">User Profile</a>
           </li>
           <li>
-            <asl-google-signin-button type='standard' size='medium' *ngIf="!loggedIn"></asl-google-signin-button>
+            <button class="btn btn-primary" *ngIf="!loggedIn" (click)="login()">Login</button>
             <button class="btn btn-primary" *ngIf="loggedIn" (click)="logout()">Logout</button>
           </li>
         </ul>
