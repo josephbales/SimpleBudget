@@ -3,60 +3,46 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
-import { MsalModule, MsalRedirectComponent, MsalGuard, MsalInterceptor } from '@azure/msal-angular';
-import { PublicClientApplication, InteractionType } from '@azure/msal-browser';
+import { SocialLoginModule, GoogleSigninButtonModule } from '@abacritt/angularx-social-login';
 
 import { AppComponent } from './app.component';
-import { NavMenuComponent } from './nav-menu/nav-menu.component';
-import { HomeComponent } from './home/home.component';
-import { CounterComponent } from './counter/counter.component';
-import { FetchDataComponent } from './fetch-data/fetch-data.component';
+import { NavMenuComponent } from './shared/components/nav-menu/nav-menu.component';
+import { HomeComponent } from './components/home/home.component';
+import { FetchDataComponent } from './components/fetch-data/fetch-data.component';
+import { UserProfileComponent } from './components/user-profile/user-profile.component';
+import { UserDashboardComponent } from './components/user-dashboard/user-dashboard.component';
+import { UserLoginComponent } from './components/user-login/user-login.component';
 
-const isIE = window.navigator.userAgent.indexOf('MSIE ') > -1 || window.navigator.userAgent.indexOf('Trident/') > -1;
+import { JwtModule } from '@auth0/angular-jwt';
+import { jwtConfig, socialAuthServiceConfig } from './auth-config';
 
 @NgModule({
   declarations: [
     AppComponent,
     NavMenuComponent,
     HomeComponent,
-    CounterComponent,
-    FetchDataComponent
+    FetchDataComponent,
+    UserProfileComponent,
+    UserDashboardComponent,
+    UserLoginComponent,
   ],
   imports: [
-    BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
+    BrowserModule,
     HttpClientModule,
     FormsModule,
     AppRoutingModule,
-    MsalModule.forRoot(new PublicClientApplication({
-      auth: {
-        clientId: '288987e5-09f1-49e9-a010-984ffcaa1115', // Application (client) ID from the app registration
-        authority: 'https://login.microsoftonline.com/ce6adbfd-08c9-4e50-b206-5a1ac8226e9f', // The Azure cloud instance and the app's sign-in audience (tenant ID, common, organizations, or consumers)
-        redirectUri: 'https://localhost:44428/'// This is your redirect URI
-      },
-      cache: {
-        cacheLocation: 'localStorage',
-        storeAuthStateInCookie: isIE, // Set to true for Internet Explorer 11
-      }
-    }), {
-      interactionType: InteractionType.Redirect, // MSAL Guard Configuration
-      authRequest: {
-        scopes: ['user.read']
-      }
-    }, {
-      interactionType: InteractionType.Redirect, // MSAL Interceptor Configuration
-      protectedResourceMap: new Map([
-        ['https://localhost:44428/api/**', ['user.read']]
-      ])
+    SocialLoginModule,
+    GoogleSigninButtonModule,
+    JwtModule.forRoot({
+      config: jwtConfig
     })
   ],
   providers: [
     {
-      provide: HTTP_INTERCEPTORS,
-      useClass: MsalInterceptor,
-      multi: true
-    },
-    MsalGuard
+      provide: 'SocialAuthServiceConfig',
+      useValue: socialAuthServiceConfig,
+    }
   ],
-  bootstrap: [AppComponent, MsalRedirectComponent]
+  bootstrap: [AppComponent]
 })
 export class AppModule { }

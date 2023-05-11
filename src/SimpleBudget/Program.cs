@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Web;
+using Microsoft.IdentityModel.Logging;
 using SimpleBudget.Data.Context;
-using System.Configuration;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -18,7 +17,9 @@ JsonSerializerOptions options = new()
     WriteIndented = true
 };
 
-services.AddControllers().AddJsonOptions(opt => opt.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+services.AddControllers().AddJsonOptions(opt =>
+    opt.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+
 services.AddDbContext<SimpleBudgetContext>(options =>
     options.UseCosmos(
         accountEndpoint: configuration.GetValue<string>("Azure:CosmosDB:AccountEndpoint")
@@ -28,45 +29,54 @@ services.AddDbContext<SimpleBudgetContext>(options =>
         databaseName: configuration.GetValue<string>("Azure:CosmosDB:DataBaseName")
             ?? throw new ArgumentNullException())
     );
-//services.AddAuthentication().AddMicrosoftAccount(microsoftOptions =>
+
+//services.AddAuthentication().AddGoogle(options =>
 //{
-//    microsoftOptions.ClientId = configuration["Authentication:Microsoft:ClientId"]
+//    options.ClientId = configuration["Authentication:Google:ClientId"]
 //        ?? throw new ArgumentNullException();
-//    microsoftOptions.ClientSecret = configuration["Authentication:Microsoft:ClientSecret"]
+//    options.ClientSecret = configuration["Authentication:Google:ClientSecret"]
 //        ?? throw new ArgumentNullException();
+//    options.Events.
 //});
 
-services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddMicrosoftIdentityWebApi(options =>
-    {
-        configuration.Bind("AzureAd", options);
-        options.Events = new JwtBearerEvents();
+//services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+//    .AddMicrosoftIdentityWebApi(options =>
+//    {
+//        configuration.Bind("AzureAd", options);
+//        options.Events = new JwtBearerEvents();
+//        options.Events.OnTokenValidated = async context =>
+//        {
+//            var principal = context.Principal;
 
-        /// <summary>
-        /// Below you can do extended token validation and check for additional claims, such as:
-        ///
-        /// - check if the caller's account is homed or guest via the 'acct' optional claim
-        /// - check if the caller belongs to right roles or groups via the 'roles' or 'groups' claim, respectively
-        ///
-        /// Bear in mind that you can do any of the above checks within the individual routes and/or controllers as well.
-        /// For more information, visit: https://docs.microsoft.com/azure/active-directory/develop/access-tokens#validate-the-user-has-permission-to-access-this-data
-        /// </summary>
+//            if (principal != null)
+//            {
+//                var dbContext = context.HttpContext.RequestServices.GetRequiredService<SimpleBudgetContext>();
 
-        options.Events.OnTokenValidated = async context =>
-        {
-            string[] allowedClientApps = { /* list of client ids to allow */ };
+//                var userEmailClaim = principal.Claims
+//                    .FirstOrDefault(x => x.Type == ClaimTypes.Email);
+//                var user = await dbContext.Users
+//                    .FirstOrDefaultAsync(x => x.Email == userEmailClaim.Value);
 
-            string clientAppId = context?.Principal?.Claims
-                .FirstOrDefault(x => x.Type == "azp" || x.Type == "appid")?.Value;
+//                if (user == null)
+//                {
+//                    context.Fail("Not Authorized");
+//                }
+//                else
+//                {
+//                    context.Principal.Identities.First().AddClaim(new Claim("isadmin", "true", ClaimValueTypes.Boolean));
+//                }
+//            }
+//            else
+//            {
+//                context.Fail("Not Authorized");
+//            }
+//        };
+//    }, options => { configuration.Bind("AzureAd", options); });
 
-            var user = context.Principal;
-
-            if (!allowedClientApps.Contains(clientAppId))
-            {
-                throw new System.Exception("This client is not authorized");
-            }
-        };
-    }, options => { configuration.Bind("AzureAd", options); });
+if (builder.Environment.IsDevelopment())
+{
+    IdentityModelEventSource.ShowPII = true;
+}
 
 var app = builder.Build();
 
@@ -80,7 +90,7 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
-app.UseAuthorization();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(

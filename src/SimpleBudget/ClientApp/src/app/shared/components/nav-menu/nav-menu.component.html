@@ -20,25 +20,24 @@
         [ngClass]="{ show: isExpanded }"
       >
         <ul class="navbar-nav flex-grow">
-          <li
-            class="nav-item"
-            [routerLinkActive]="['link-active']"
-            [routerLinkActiveOptions]="{ exact: true }"
-          >
+          <li class="nav-item"
+              [routerLinkActive]="['link-active']"
+              [routerLinkActiveOptions]="{ exact: true }">
             <a class="nav-link text-dark" [routerLink]="['/']">Home</a>
           </li>
           <li class="nav-item" [routerLinkActive]="['link-active']">
-            <a class="nav-link text-dark" [routerLink]="['/counter']"
-              >Counter</a
-            >
+            <a class="nav-link text-dark" [routerLink]="['/fetch-data']">Fetch data</a>
           </li>
           <li class="nav-item" [routerLinkActive]="['link-active']">
-            <a class="nav-link text-dark" [routerLink]="['/fetch-data']"
-              >Fetch data</a
-            >
+            <a class="nav-link text-dark" [routerLink]="['/dashboard']">User Dashboard</a>
           </li>
-          <li><button *ngIf="loginDisplay" (click)="testUser()">Test User</button></li>
-          <li><button *ngIf="!loginDisplay" (click)="login()">Login</button></li>
+          <li class="nav-item" [routerLinkActive]="['link-active']">
+            <a class="nav-link text-dark" [routerLink]="['/profile']">User Profile</a>
+          </li>
+          <li>
+            <button class="btn btn-primary" *ngIf="!loggedIn" (click)="login()">Login</button>
+            <button class="btn btn-primary" *ngIf="loggedIn" (click)="logout()">Logout</button>
+          </li>
         </ul>
       </div>
     </div>
