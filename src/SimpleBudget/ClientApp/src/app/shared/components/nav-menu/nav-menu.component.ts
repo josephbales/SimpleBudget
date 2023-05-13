@@ -1,10 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
 import { AuthenticationService } from '../../../services/authentication.service';
-import { ExternalAuthDto } from '../../../models/externalAuthDto';
-import { HttpErrorResponse } from '@angular/common/http';
-import { Router, RouterStateSnapshot } from '@angular/router';
-import { SocialAuthService, SocialUser } from '@abacritt/angularx-social-login';
+import { Router } from '@angular/router';
+import { SocialUser } from '@abacritt/angularx-social-login';
 
 @Component({
   selector: 'app-nav-menu',
@@ -12,13 +10,12 @@ import { SocialAuthService, SocialUser } from '@abacritt/angularx-social-login';
   styleUrls: ['./nav-menu.component.css']
 })
 export class NavMenuComponent implements OnInit, OnDestroy {
-  private returnUrl: string = "";
-
-  user: SocialUser = {} as SocialUser;
+  //user: SocialUser = {} as SocialUser;
   loggedIn: boolean = false;
   isExpanded: boolean = false;
   showError: boolean = false;
   errorMessage: string = '';
+  userImgUrl: string = '';
   private readonly _destroying$ = new Subject<void>();
 
   constructor(
@@ -29,8 +26,14 @@ export class NavMenuComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.authService.authChanged.pipe(takeUntil(this._destroying$)).subscribe((isAuthenticated) => {
       this.loggedIn = isAuthenticated;
+      if (isAuthenticated) {
+        this.userImgUrl = this.authService.getUser().photoUrl;
+      }
     });
     this.loggedIn = this.authService.isUserAuthenticated();
+    if (this.loggedIn) {
+      this.userImgUrl = this.authService.getUser().photoUrl; // TODO: find out why this doesn't load image on refresh
+    }
   }
 
   login(): void {
@@ -38,20 +41,6 @@ export class NavMenuComponent implements OnInit, OnDestroy {
     const returnUrl = existingReturnUrl ? existingReturnUrl : this.router.routerState.snapshot.url;
     this.router.navigate(['/login'], { queryParams: { returnUrl: returnUrl } });
   }
-
-  //externalLogin = () => {
-  //  this.showError = false;
-  //  this.authService.signInWithGoogle();
-
-  //  this.authService.extAuthChanged.subscribe(user => {
-  //    const externalAuth: ExternalAuthDto = {
-  //      provider: user.provider,
-  //      idToken: user.idToken
-  //    }
-
-  //    this.validateExternalAuth(externalAuth);
-  //  })
-  //}
 
   public logout = () => {
     this.authService.logout();
@@ -69,20 +58,4 @@ export class NavMenuComponent implements OnInit, OnDestroy {
     this._destroying$.next(undefined);
     this._destroying$.complete();
   }
-
-  //private validateExternalAuth(externalAuth: ExternalAuthDto) {
-  //  this.authService.externalLogin(externalAuth)
-  //    .subscribe({
-  //      next: (res) => {
-  //        localStorage.setItem("token", res.token);
-  //        this.authService.sendAuthStateChangeNotification(res.isAuthSuccessful);
-  //        this.router.navigate([this.returnUrl]);
-  //      },
-  //      error: (err: HttpErrorResponse) => {
-  //        this.errorMessage = err.message;
-  //        this.showError = true;
-  //        this.authService.signOutExternal();
-  //      }
-  //    });
-  //}
 }

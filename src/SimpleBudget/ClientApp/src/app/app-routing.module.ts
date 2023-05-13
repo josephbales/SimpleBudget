@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { FetchDataComponent } from './components/fetch-data/fetch-data.component';
 import { HomeComponent } from './components/home/home.component';
 import { UserProfileComponent } from './components/user-profile/user-profile.component';
 import { UserDashboardComponent } from './components/user-dashboard/user-dashboard.component';
@@ -12,10 +11,6 @@ const routes: Routes = [
     path: '',
     component: HomeComponent,
     pathMatch: 'full'
-  },
-  {
-    path: 'fetch-data',
-    component: FetchDataComponent,
   },
   {
     path: 'profile',

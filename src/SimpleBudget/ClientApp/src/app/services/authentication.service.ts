@@ -26,6 +26,7 @@ export class AuthenticationService {
         console.log('externalLogin', resp);
         if (resp.isAuthSuccessful) {
           localStorage.setItem('token', JSON.stringify(resp));
+          localStorage.setItem('user', JSON.stringify(user)); // TODO: oh my, please fix this so that user comes from backend
           this.authChangeSub.next(true);
         }
         else {
@@ -39,23 +40,37 @@ export class AuthenticationService {
     this.authChangeSub.next(isAuthenticated);
   }
 
+  public getUser = (): SocialUser => {
+    let user = {} as SocialUser;
+    const userJson: string | null = localStorage.getItem('user');
+    try {
+      if (userJson !== null) {
+        user = JSON.parse(userJson) as SocialUser;
+      }
+    }
+    catch (e) {
+      this.logout();
+    }
+    return user;
+  }
+
   public logout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
     this.sendAuthStateChangeNotification(false);
     this.router.navigate(['/login']);
   }
 
   public isUserAuthenticated = (): boolean => {
     const tokenJson: string | null = localStorage.getItem('token');
-    console.log('tokenJson', tokenJson);
+    const userJson: string | null = localStorage.getItem('user');
     let auth: AuthResponseDto = {} as AuthResponseDto;
-    if (tokenJson) {
+    if (tokenJson !== null && userJson !== null) {
       // Check for errors and handle
       try {
         auth = JSON.parse(tokenJson) as AuthResponseDto;
-        console.log('auth', auth);
       } catch (e) {
-        console.log('e', e);
+        console.error(e);
         this.logout();
       }
     }

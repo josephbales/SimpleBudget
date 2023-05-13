@@ -8,7 +8,6 @@ import { SocialLoginModule, GoogleSigninButtonModule } from '@abacritt/angularx-
 import { AppComponent } from './app.component';
 import { NavMenuComponent } from './shared/components/nav-menu/nav-menu.component';
 import { HomeComponent } from './components/home/home.component';
-import { FetchDataComponent } from './components/fetch-data/fetch-data.component';
 import { UserProfileComponent } from './components/user-profile/user-profile.component';
 import { UserDashboardComponent } from './components/user-dashboard/user-dashboard.component';
 import { UserLoginComponent } from './components/user-login/user-login.component';
@@ -21,7 +20,6 @@ import { jwtConfig, socialAuthServiceConfig } from './auth-config';
     AppComponent,
     NavMenuComponent,
     HomeComponent,
-    FetchDataComponent,
     UserProfileComponent,
     UserDashboardComponent,
     UserLoginComponent,
