@@ -10,6 +10,6 @@ export class UserProfileComponent {
   user: SocialUser = {} as SocialUser;
 
   constructor(private authService: AuthenticationService) {
-    this.user = this.authService.getUser();
+    this.user = this.authService.getUser() ?? this.user;
   }
 }

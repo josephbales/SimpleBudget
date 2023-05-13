@@ -7,7 +7,7 @@ import { SocialUser } from '@abacritt/angularx-social-login';
 @Component({
   selector: 'app-nav-menu',
   templateUrl: './nav-menu.component.html',
-  styleUrls: ['./nav-menu.component.css']
+  styleUrls: ['./nav-menu.component.scss']
 })
 export class NavMenuComponent implements OnInit, OnDestroy {
   //user: SocialUser = {} as SocialUser;
@@ -27,12 +27,12 @@ export class NavMenuComponent implements OnInit, OnDestroy {
     this.authService.authChanged.pipe(takeUntil(this._destroying$)).subscribe((isAuthenticated) => {
       this.loggedIn = isAuthenticated;
       if (isAuthenticated) {
-        this.userImgUrl = this.authService.getUser().photoUrl;
+        this.userImgUrl = this.authService.getUserPhotoUrl();
       }
     });
     this.loggedIn = this.authService.isUserAuthenticated();
     if (this.loggedIn) {
-      this.userImgUrl = this.authService.getUser().photoUrl; // TODO: find out why this doesn't load image on refresh
+      this.userImgUrl = this.authService.getUserPhotoUrl(); // TODO: find out why this doesn't load image on refresh
     }
   }
 

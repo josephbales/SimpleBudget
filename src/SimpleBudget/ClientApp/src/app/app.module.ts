@@ -14,6 +14,11 @@ import { UserLoginComponent } from './components/user-login/user-login.component
 
 import { JwtModule } from '@auth0/angular-jwt';
 import { jwtConfig, socialAuthServiceConfig } from './auth-config';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatIconModule } from "@angular/material/icon";
+import { MatButtonModule } from "@angular/material/button";
+import { MatMenuModule } from "@angular/material/menu";
 
 @NgModule({
   declarations: [
@@ -33,7 +38,12 @@ import { jwtConfig, socialAuthServiceConfig } from './auth-config';
     GoogleSigninButtonModule,
     JwtModule.forRoot({
       config: jwtConfig
-    })
+    }),
+    BrowserAnimationsModule,
+    MatToolbarModule,
+    MatIconModule,
+    MatButtonModule,
+    MatMenuModule,
   ],
   providers: [
     {

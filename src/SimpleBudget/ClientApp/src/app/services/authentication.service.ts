@@ -1,9 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, ReplaySubject, Subject } from 'rxjs';
+import { ReplaySubject, Subject } from 'rxjs';
 import { SocialAuthService, SocialUser } from '@abacritt/angularx-social-login';
 import { JwtHelperService } from '@auth0/angular-jwt';
-import { ExternalAuthDto} from '../models/externalAuthDto';
 import { AuthResponseDto } from '../models/authResponseDto';
 import { Router } from '@angular/router';
 import { ApiService } from './api.service';
@@ -16,8 +14,7 @@ export class AuthenticationService {
   public authChanged = this.authChangeSub.asObservable();
   public isLoggedIn = new ReplaySubject<boolean>(1);
 
-  constructor(private http: HttpClient,
-    private jwtHelper: JwtHelperService,
+  constructor(private jwtHelper: JwtHelperService,
     private socialAuthService: SocialAuthService,
     private router: Router,
     private apiService: ApiService) {
@@ -40,11 +37,16 @@ export class AuthenticationService {
     this.authChangeSub.next(isAuthenticated);
   }
 
-  public getUser = (): SocialUser => {
-    let user = {} as SocialUser;
+  public getUserPhotoUrl = (): string => {
+    let user = this.getUser();
+    return user !== null ? user.photoUrl : '/assets/images/generic-user.png';
+  }
+
+  public getUser = (): SocialUser | null => {
+    let user = null;
     const userJson: string | null = localStorage.getItem('user');
     try {
-      if (userJson !== null) {
+      if (userJson !== null && this.isUserAuthenticated()) {
         user = JSON.parse(userJson) as SocialUser;
       }
     }
