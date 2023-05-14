@@ -1,5 +1,5 @@
 <header>
-  <mat-toolbar color="primary">
+  <mat-toolbar color="primary" role="heading">
     <span class="home-title"><a [routerLink]="['/']">Simple Budget</a></span>
     <span class="example-spacer"></span>
     <a mat-icon-button [routerLink]="['/dashboard']"><mat-icon>dataset</mat-icon></a>
@@ -9,9 +9,11 @@
     <button mat-icon-button *ngIf="loggedIn" [matMenuTriggerFor]="userMenu">
       <mat-icon>person</mat-icon>
     </button>
-    <mat-menu #userMenu="matMenu">
-      <a mat-menu-item [routerLink]="['/profile']">Profile</a>
-      <a mat-menu-item (click)="logout()">Logout</a>
+    <mat-menu #userMenu="matMenu" xPosition="before">
+      <ng-template matMenuContent>
+        <a mat-menu-item [routerLink]="['/profile']">Profile</a>
+        <a mat-menu-item (click)="logout()">Logout</a>
+      </ng-template>
     </mat-menu>
   </mat-toolbar>
 </header>
