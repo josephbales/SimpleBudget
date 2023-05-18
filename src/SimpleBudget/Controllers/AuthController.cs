@@ -17,37 +17,41 @@ namespace SimpleBudget.Controllers
             _configuration = configuration;
         }
 
-        [Route("external-login")]
+        [Route("login")]
         [HttpPost]
-        public async Task<ActionResult<AuthResponseDto>> ExternalLogin([FromBody] ExternalAuthDto dto)
-        {
-            var tokenIsValid = await ValidateGoogleToken(dto.IdToken ?? "");
-            return Ok(new AuthResponseDto
-            {
-                Token = tokenIsValid ? dto.IdToken : null,
-                IsAuthSuccessful = tokenIsValid,
-                Provider = dto.Provider,
-                ErrorMessage = !tokenIsValid ? $"{dto.Provider} doesn't like your token." : null
-            });
-        }
-
-        private async Task<bool> ValidateGoogleToken(string token)
+        public async Task<ActionResult<AuthResponseDto>> Login([FromBody] AuthRequestDto dto)
         {
             try
             {
-                var settings = new GoogleJsonWebSignature.ValidationSettings
-                {
-                    Audience = new[] { _configuration.GetValue<string>("Authentication:Google:ClientId") },
-                    IssuedAtClockTolerance = TimeSpan.FromMinutes(5),
-                    ExpirationTimeClockTolerance = TimeSpan.FromMinutes(5),
-                };
-                var payload = await GoogleJsonWebSignature.ValidateAsync(token, settings);
-                return true;
+                var response = await ValidateGoogleToken(dto);
+                return Ok(response);
             }
             catch (InvalidJwtException)
             {
-                return false;
+                return Unauthorized();
             }
+        }
+
+        private async Task<AuthResponseDto> ValidateGoogleToken(AuthRequestDto dto)
+        {
+            var settings = new GoogleJsonWebSignature.ValidationSettings
+            {
+                Audience = new[] { _configuration.GetValue<string>("Authentication:Google:ClientId") },
+                IssuedAtClockTolerance = TimeSpan.FromMinutes(5),
+                ExpirationTimeClockTolerance = TimeSpan.FromMinutes(5),
+            };
+            var payload = await GoogleJsonWebSignature.ValidateAsync(dto.IdToken, settings);
+
+            return new AuthResponseDto
+            {
+                Username = payload.Email,
+                UserId = Guid.NewGuid(),
+                Email = payload.Email,
+                Provider = dto.Provider,
+                AvatarUrl = payload.Picture,
+                AuthToken = dto.IdToken, // generate an app token here
+                RefreshToken = dto.IdToken, // generate a refresh token here
+            };
         }
     }
 }

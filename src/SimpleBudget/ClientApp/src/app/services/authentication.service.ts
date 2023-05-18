@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
-import { ReplaySubject, Subject } from 'rxjs';
+import { BehaviorSubject, ReplaySubject, Subject } from 'rxjs';
 import { SocialAuthService, SocialUser } from '@abacritt/angularx-social-login';
 import { JwtHelperService } from '@auth0/angular-jwt';
-import { AuthResponseDto } from '../models/authResponseDto';
+import { AuthResponseDto } from '../dtos/authResponseDto';
 import { Router } from '@angular/router';
 import { ApiService } from './api.service';
+import { UserModel } from '../models/user.model';
 
 @Injectable({
   providedIn: 'root'
@@ -30,7 +31,7 @@ export class AuthenticationService {
           console.error('User is not authenticated.');
         }
       });
-    })
+    });
   }
 
   public sendAuthStateChangeNotification = (isAuthenticated: boolean) => {

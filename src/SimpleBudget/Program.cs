@@ -8,6 +8,7 @@ using System.Text.Json.Serialization;
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
 var configuration = builder.Configuration;
+var env = builder.Environment;
 
 // Add services to the container.
 
@@ -29,6 +30,8 @@ services.AddDbContext<SimpleBudgetContext>(options =>
         databaseName: configuration.GetValue<string>("Azure:CosmosDB:DataBaseName")
             ?? throw new ArgumentNullException())
     );
+
+services.AddAuthentication();
 
 //services.AddAuthentication().AddGoogle(options =>
 //{
@@ -72,8 +75,9 @@ services.AddDbContext<SimpleBudgetContext>(options =>
 //            }
 //        };
 //    }, options => { configuration.Bind("AzureAd", options); });
+services.AddSwaggerGen();
 
-if (builder.Environment.IsDevelopment())
+if (env.IsDevelopment())
 {
     IdentityModelEventSource.ShowPII = true;
 }
@@ -85,6 +89,11 @@ if (!app.Environment.IsDevelopment())
 {
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
+}
+else
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
