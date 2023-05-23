@@ -1,15 +1,17 @@
-import { SocialUser } from '@abacritt/angularx-social-login';
 import { Component } from '@angular/core';
-import { AuthenticationService } from '../../services/authentication.service';
+import { UserModel } from '../../models/user.model';
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-user-profile',
   templateUrl: './user-profile.component.html',
 })
 export class UserProfileComponent {
-  user: SocialUser = {} as SocialUser;
+  user: UserModel = {} as UserModel;
 
-  constructor(private authService: AuthenticationService) {
-    this.user = this.authService.getUser() ?? this.user;
+  constructor(private userService: UserService) {
+    this.userService.currentUser.subscribe((user) => {
+      this.user = user ?? {} as UserModel;
+    });
   }
 }

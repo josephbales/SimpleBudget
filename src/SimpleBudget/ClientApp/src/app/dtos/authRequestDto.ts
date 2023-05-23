@@ -1,4 +1,4 @@
 export interface AuthRequestDto {
-  provider: string;
+  provider: number; // TODO: pass in non-case sensitive to backend.
   idToken: string;
 }

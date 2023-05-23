@@ -2,6 +2,6 @@
 {
     public enum AuthProvider
     {
-        Google
+        GOOGLE
     }
 }

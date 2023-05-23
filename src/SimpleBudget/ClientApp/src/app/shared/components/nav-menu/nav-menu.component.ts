@@ -1,8 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
-import { AuthenticationService } from '../../../services/authentication.service';
 import { Router } from '@angular/router';
-import { SocialUser } from '@abacritt/angularx-social-login';
+import { UserService } from '../../../services/user.service';
 
 @Component({
   selector: 'app-nav-menu',
@@ -10,30 +9,21 @@ import { SocialUser } from '@abacritt/angularx-social-login';
   styleUrls: ['./nav-menu.component.scss']
 })
 export class NavMenuComponent implements OnInit, OnDestroy {
-  //user: SocialUser = {} as SocialUser;
   loggedIn: boolean = false;
   isExpanded: boolean = false;
   showError: boolean = false;
   errorMessage: string = '';
-  userImgUrl: string = '';
   private readonly _destroying$ = new Subject<void>();
 
   constructor(
-    private authService: AuthenticationService,
+    private userService: UserService,
     private router: Router,
   ) { }
 
   ngOnInit(): void {
-    this.authService.authChanged.pipe(takeUntil(this._destroying$)).subscribe((isAuthenticated) => {
+    this.userService.authChanged.pipe(takeUntil(this._destroying$)).subscribe((isAuthenticated) => {
       this.loggedIn = isAuthenticated;
-      if (isAuthenticated) {
-        this.userImgUrl = this.authService.getUserPhotoUrl();
-      }
     });
-    this.loggedIn = this.authService.isUserAuthenticated();
-    if (this.loggedIn) {
-      this.userImgUrl = this.authService.getUserPhotoUrl(); // TODO: find out why this doesn't load image on refresh
-    }
   }
 
   login(): void {
@@ -43,7 +33,7 @@ export class NavMenuComponent implements OnInit, OnDestroy {
   }
 
   public logout = () => {
-    this.authService.logout();
+    this.userService.logout();
   }
 
   collapse() {

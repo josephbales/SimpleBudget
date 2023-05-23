@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
-import { AuthenticationService } from '../../services/authentication.service';
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-user-login',
@@ -12,12 +12,12 @@ export class UserLoginComponent implements OnInit, OnDestroy {
   private readonly _destroying$ = new Subject<void>();
 
   constructor(
-    private authService: AuthenticationService,
+    private userService: UserService,
     private router: Router,
   ) { }
 
   ngOnInit(): void {
-    this.authService.authChanged.pipe(takeUntil(this._destroying$)).subscribe((isAuthenticated) => {
+    this.userService.authChanged.pipe(takeUntil(this._destroying$)).subscribe((isAuthenticated) => {
       this.loggedIn = isAuthenticated;
 
       if (isAuthenticated) {
@@ -28,11 +28,11 @@ export class UserLoginComponent implements OnInit, OnDestroy {
       }
     });
 
-    this.loggedIn = this.authService.isUserAuthenticated();
+    //this.loggedIn = this.userService.isAuthenticated;
   }
 
   logout(): void {
-    this.authService.logout();
+    this.userService.logout();
   }
 
   ngOnDestroy(): void {

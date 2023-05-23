@@ -31,7 +31,12 @@ services.AddDbContext<SimpleBudgetContext>(options =>
             ?? throw new ArgumentNullException())
     );
 
-services.AddAuthentication();
+services.AddAuthentication(opt =>
+{
+    opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    opt.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+});
 
 //services.AddAuthentication().AddGoogle(options =>
 //{
