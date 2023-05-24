@@ -29,7 +29,7 @@ export class UserService {
             this.setAuth(appUser);
           }
           else {
-            // TODO: show an error on the screen
+            // TODO: show an error on the screen.
             alert('User auth did not complete correctly');
             console.error('User is not authenticated.');
           }
