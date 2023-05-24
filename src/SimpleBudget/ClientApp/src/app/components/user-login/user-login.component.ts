@@ -17,7 +17,7 @@ export class UserLoginComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
-    this.userService.authChanged.pipe(takeUntil(this._destroying$)).subscribe((isAuthenticated) => {
+    this.userService.isAuthenticated.pipe(takeUntil(this._destroying$)).subscribe((isAuthenticated) => {
       this.loggedIn = isAuthenticated;
 
       if (isAuthenticated) {
