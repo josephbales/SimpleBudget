@@ -1,6 +1,6 @@
-﻿namespace SimpleBudget.DTOs
+﻿namespace SimpleBudget.Models.Auth
 {
-    public class AuthResponseDto
+    public class AuthResponse
     {
         public bool IsAuthSuccessful { get; set; }
         public string? ErrorMessage { get; set; }

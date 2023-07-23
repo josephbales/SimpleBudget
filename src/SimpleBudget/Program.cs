@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Logging;
+using Microsoft.OpenApi.Models;
 using SimpleBudget.Data.Context;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -9,69 +10,23 @@ var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
 var configuration = builder.Configuration;
 
-// Add services to the container.
-
-JsonSerializerOptions options = new()
+services.AddSwaggerGen(c =>
 {
-    ReferenceHandler = ReferenceHandler.IgnoreCycles,
-    WriteIndented = true
-};
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Simple Budget", Version = "v1" });
+});
 
 services.AddControllers().AddJsonOptions(opt =>
-    opt.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+{
+    opt.JsonSerializerOptions.WriteIndented = true;
+    opt.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+    opt.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+    opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
 
 services.AddDbContext<SimpleBudgetContext>(options =>
-    options.UseCosmos(
-        accountEndpoint: configuration.GetValue<string>("Azure:CosmosDB:AccountEndpoint")
-            ?? throw new ArgumentNullException(),
-        accountKey: configuration.GetValue<string>("Azure:CosmosDB:AccountKey")
-            ?? throw new ArgumentNullException(),
-        databaseName: configuration.GetValue<string>("Azure:CosmosDB:DataBaseName")
-            ?? throw new ArgumentNullException())
-    );
-
-//services.AddAuthentication().AddGoogle(options =>
-//{
-//    options.ClientId = configuration["Authentication:Google:ClientId"]
-//        ?? throw new ArgumentNullException();
-//    options.ClientSecret = configuration["Authentication:Google:ClientSecret"]
-//        ?? throw new ArgumentNullException();
-//    options.Events.
-//});
-
-//services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-//    .AddMicrosoftIdentityWebApi(options =>
-//    {
-//        configuration.Bind("AzureAd", options);
-//        options.Events = new JwtBearerEvents();
-//        options.Events.OnTokenValidated = async context =>
-//        {
-//            var principal = context.Principal;
-
-//            if (principal != null)
-//            {
-//                var dbContext = context.HttpContext.RequestServices.GetRequiredService<SimpleBudgetContext>();
-
-//                var userEmailClaim = principal.Claims
-//                    .FirstOrDefault(x => x.Type == ClaimTypes.Email);
-//                var user = await dbContext.Users
-//                    .FirstOrDefaultAsync(x => x.Email == userEmailClaim.Value);
-
-//                if (user == null)
-//                {
-//                    context.Fail("Not Authorized");
-//                }
-//                else
-//                {
-//                    context.Principal.Identities.First().AddClaim(new Claim("isadmin", "true", ClaimValueTypes.Boolean));
-//                }
-//            }
-//            else
-//            {
-//                context.Fail("Not Authorized");
-//            }
-//        };
-//    }, options => { configuration.Bind("AzureAd", options); });
+    options
+        .UseNpgsql(configuration.GetConnectionString("AppDb"))
+        .UseSnakeCaseNamingConvention());
 
 if (builder.Environment.IsDevelopment())
 {
@@ -86,6 +41,12 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.yaml", "Simple Budget");
+});
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();

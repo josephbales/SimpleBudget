@@ -1,7 +1,7 @@
 ﻿using Google.Apis.Auth;
 using Microsoft.AspNetCore.Mvc;
 using SimpleBudget.Data.Context;
-using SimpleBudget.DTOs;
+using SimpleBudget.Models.Auth;
 
 namespace SimpleBudget.Controllers
 {
@@ -19,10 +19,10 @@ namespace SimpleBudget.Controllers
 
         [Route("external-login")]
         [HttpPost]
-        public async Task<ActionResult<AuthResponseDto>> ExternalLogin([FromBody] ExternalAuthDto dto)
+        public async Task<ActionResult<AuthResponse>> ExternalLogin([FromBody] ExternalAuthRequest dto)
         {
             var tokenIsValid = await ValidateGoogleToken(dto.IdToken ?? "");
-            return Ok(new AuthResponseDto
+            return Ok(new AuthResponse
             {
                 Token = tokenIsValid ? dto.IdToken : null,
                 IsAuthSuccessful = tokenIsValid,

@@ -17,30 +17,45 @@ namespace SimpleBudget.Data.Context
         public DbSet<BudgetItem> BudgetItems { get; set; } = null!;
 
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        protected override void OnModelCreating(ModelBuilder builder)
         {
-            // TODO: Add Fluent API configuration here
-            modelBuilder.HasDefaultContainer("User");
+            builder.HasPostgresEnum<TransactionType>();
 
-            modelBuilder.Entity<User>().HasPartitionKey(e => e.Id);
-            modelBuilder.Entity<User>().HasMany(e => e.BudgetTemplates);
-            modelBuilder.Entity<User>().HasMany(e => e.MonthBudgets);
+            builder.Entity<User>().Property(p => p.CreatedOnUtc).HasDefaultValueSql("now()");
+            builder.Entity<User>().Property(p => p.UpdatedOnUtc).HasDefaultValueSql("now()");
+            builder.Entity<User>().HasMany(e => e.BudgetTemplates);
+            builder.Entity<User>().HasMany(e => e.MonthBudgets);
+            builder.Entity<User>().HasData(
+                new User
+                {
+                    Id = 1,
+                    FirstName = "Joseph",
+                    LastName = "Bales",
+                    DisplayName = "Joey",
+                    Email = "joseph.bales@gmail.com",
+                    CreatedBy = "joseph.bales@gmail.com",
+                    UpdatedBy = "joseph.bales@gmail.com",
+                });
 
-            modelBuilder.Entity<BudgetTemplate>().HasPartitionKey(e => e.Id);
-            modelBuilder.Entity<BudgetTemplate>().HasMany(e => e.TemplateItems);
-            modelBuilder.Entity<BudgetTemplate>().HasOne(e => e.User);
+            builder.Entity<BudgetTemplate>().Property(p => p.CreatedOnUtc).HasDefaultValueSql("now()");
+            builder.Entity<BudgetTemplate>().Property(p => p.UpdatedOnUtc).HasDefaultValueSql("now()");
+            builder.Entity<BudgetTemplate>().HasMany(e => e.TemplateItems);
+            builder.Entity<BudgetTemplate>().HasOne(e => e.User);
 
-            modelBuilder.Entity<MonthBudget>().HasPartitionKey(e => e.Id);
-            modelBuilder.Entity<MonthBudget>().HasMany(e => e.BudgetItems);
-            modelBuilder.Entity<MonthBudget>().HasOne(e => e.User);
+            builder.Entity<MonthBudget>().Property(p => p.CreatedOnUtc).HasDefaultValueSql("now()");
+            builder.Entity<MonthBudget>().Property(p => p.UpdatedOnUtc).HasDefaultValueSql("now()");
+            builder.Entity<MonthBudget>().HasMany(e => e.BudgetItems);
+            builder.Entity<MonthBudget>().HasOne(e => e.User);
 
-            modelBuilder.Entity<BudgetItem>().HasPartitionKey(e => e.Id);
-            modelBuilder.Entity<BudgetItem>().HasOne(e => e.MonthBudget);
+            builder.Entity<BudgetItem>().Property(p => p.CreatedOnUtc).HasDefaultValueSql("now()");
+            builder.Entity<BudgetItem>().Property(p => p.UpdatedOnUtc).HasDefaultValueSql("now()");
+            builder.Entity<BudgetItem>().HasOne(e => e.MonthBudget);
 
-            modelBuilder.Entity<TemplateItem>().HasPartitionKey(e => e.Id);
-            modelBuilder.Entity<TemplateItem>().HasOne(e => e.BudgetTemplate);
+            builder.Entity<TemplateItem>().Property(p => p.CreatedOnUtc).HasDefaultValueSql("now()");
+            builder.Entity<TemplateItem>().Property(p => p.UpdatedOnUtc).HasDefaultValueSql("now()");
+            builder.Entity<TemplateItem>().HasOne(e => e.BudgetTemplate);
 
-            base.OnModelCreating(modelBuilder);
+            base.OnModelCreating(builder);
         }
     }
 }

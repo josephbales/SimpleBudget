@@ -1,6 +1,11 @@
 <body>
   <app-nav-menu></app-nav-menu>
-  <main class="container">
-    <router-outlet></router-outlet>
-  </main>
+  <mat-drawer-container>
+    <mat-drawer #drawer mode="side" opened="true" disableClose="true">I'm a drawer</mat-drawer>
+    <mat-drawer-content>
+      <main class="container">
+        <router-outlet></router-outlet>
+      </main>
+    </mat-drawer-content>
+  </mat-drawer-container>
 </body>
