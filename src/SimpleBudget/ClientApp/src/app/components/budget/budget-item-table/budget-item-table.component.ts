@@ -3,8 +3,9 @@ import { BudgetService } from '../../../services/budget.service';
 import { BudgetItemDto } from '../../../models/budget';
 
 @Component({
-  selector: 'app-budget-item-table',
-  templateUrl: './budget-item-table.component.html'
+  selector: 'sb-budget-item-table',
+  templateUrl: './budget-item-table.component.html',
+  styleUrls: ['./budget-item-table.component.scss']
 })
 export class BudgetItemTableComponent implements OnInit, OnDestroy {
 

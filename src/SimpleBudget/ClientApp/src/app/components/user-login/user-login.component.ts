@@ -4,7 +4,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { AuthenticationService } from '../../services/authentication.service';
 
 @Component({
-  selector: 'app-user-login',
+  selector: 'sb-user-login',
   templateUrl: './user-login.component.html',
 })
 export class UserLoginComponent implements OnInit, OnDestroy {

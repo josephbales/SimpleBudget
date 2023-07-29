@@ -7,7 +7,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { SocialLoginModule, GoogleSigninButtonModule } from '@abacritt/angularx-social-login';
 
 import { AppComponent } from './app.component';
-import { NavMenuComponent } from './shared/components/nav-menu/nav-menu.component';
+import { NavTopComponent } from './shared/components/nav-top/nav-top.component';
 import { HomeComponent } from './components/home/home.component';
 import { FetchDataComponent } from './components/fetch-data/fetch-data.component';
 import { UserProfileComponent } from './components/user-profile/user-profile.component';
@@ -27,7 +27,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 @NgModule({
   declarations: [
     AppComponent,
-    NavMenuComponent,
+    NavTopComponent,
     HomeComponent,
     FetchDataComponent,
     UserProfileComponent,

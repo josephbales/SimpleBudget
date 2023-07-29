@@ -1,8 +1,15 @@
 <body>
-  <app-nav-menu></app-nav-menu>
+  <sb-nav-top></sb-nav-top>
   <mat-drawer-container>
-    <mat-drawer #drawer mode="side" opened="true" disableClose="true">I'm a drawer</mat-drawer>
-    <mat-drawer-content>
+    <mat-drawer #drawer mode="side" opened="true" disableClose="true" style="min-width: 250px;">
+      <ul>
+        <li><a class="nav-link text-dark" [routerLink]="['/']">Home</a></li>
+        <li><a class="nav-link text-dark" [routerLink]="['/fetch-data']">Fetch data</a></li>
+        <li><a class="nav-link text-dark" [routerLink]="['/dashboard']">User Dashboard</a></li>
+        <li><a class="nav-link text-dark" [routerLink]="['/profile']">User Profile</a></li>
+      </ul>
+    </mat-drawer>
+    <mat-drawer-content style="min-height: 500px;">
       <main class="container">
         <router-outlet></router-outlet>
       </main>
