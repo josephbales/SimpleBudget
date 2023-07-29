@@ -1,0 +1,10 @@
+<mat-toolbar color="primary">
+  <span>Simple Budget</span>
+  <span class="nav-spacer"></span>
+  <button mat-icon-button *ngIf="!loggedIn" (click)="login()" aria-label="Login">
+    <mat-icon>login</mat-icon>
+  </button>
+  <button mat-icon-button *ngIf="loggedIn" (click)="logout()" aria-label="Logout">
+    <mat-icon>logout</mat-icon>
+  </button>
+</mat-toolbar>
